@@ -1,10 +1,13 @@
 # coding: utf-8
 
 from Models.Contato import Contato
+import os
+import pickle
+
+ARQUIVO = r"lista.dat"
 
 opcao = ""
 lista = []
-
 
 def novo():
     nome = input("Nome?\n")
@@ -40,26 +43,19 @@ def remover():
 
 def listar():
     for c in lista:
-        print(c.tostring())
+        print(c)
 
 
 def salvar():
-    arquivo = open(r"lista.txt", "w")
-    linhas = []
-    for c in lista:
-        linhas.append(c.tostring()+"|")
-    arquivo.writelines(linhas)
-    arquivo.close()
+    pickle.dump(lista, open(ARQUIVO, "wb"))
 
 
 def carregar():
-    arquivo = open(r"lista.txt")
-    linhas = arquivo.read().split("|")
-    arquivo.close()
-    for l in linhas:
-        if l != "":
-            c = l.split(": ")
-            lista.append(Contato(c[0], c[1]));
+    global lista
+    try:
+        lista = pickle.load(open(ARQUIVO, "rb"))
+    except:
+        pickle.dump(lista, open(ARQUIVO, "wb"))
 
 
 carregar()
@@ -68,7 +64,6 @@ carregar()
 while opcao != "0":
     print("---------------------\n0: sair\n1: novo\n2: listar\n3: editar\n4: remover")
     opcao = input("O que deseja fazer?")
-
     if opcao == "1":
         novo()
     elif opcao == "2":

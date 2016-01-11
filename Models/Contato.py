@@ -3,7 +3,7 @@ class Contato(object):
         self.__nome = nome
         self.__telefone = telefone
 
-    def tostring(self):
+    def __repr__(self):
         return "%s: %s" % (self.__nome, self.__telefone)
 
     def get_nome(self):
