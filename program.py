@@ -1,9 +1,12 @@
 # coding: utf-8
 
 from Models.Contato import Contato
-import pickle
+import sqlite3
 
-ARQUIVO = r"lista.dat"
+ARQUIVO_DB = "data.db"
+
+con = sqlite3.connect(ARQUIVO_DB)
+cur = con.cursor()
 
 opcao = ""
 lista = []
@@ -11,8 +14,8 @@ lista = []
 def novo():
     nome = input("Nome?\n")
     telefone = input("Telefone?\n")
-    contato = Contato(nome, telefone)
-    lista.append(contato)
+    sql = "INSERT INTO Contato (Nome, Telefone) VALUES (?, ?)"
+    cur.execute(sql, (nome, telefone))
     salvar()
 
 
@@ -20,41 +23,61 @@ def editar():
     nome = input("Nome?\n")
     novo_nome = input("Novo nome? (Deixe vazio se não quiser alterar)\n")
     novo_telefone = input("Novo telefone? (Deixe vazio se não quiser alterar)\n")
-    for i in range(len(lista)):
-        if lista[i].nome == nome:
-            lista[i].nome = novo_nome
-            lista[i].telefone = novo_telefone
-            break
+
+    set = ""
+    if novo_telefone:
+        set += "Telefone = ?"
+
+    if novo_nome:
+        if set:
+            set += ", "
+        set += "Nome = ?"
+
+    sql = "UPDATE Contato " \
+          "SET " + set + \
+          " WHERE Nome LIKE ?"
+
+    if novo_nome and novo_telefone:
+        cur.execute(sql, (novo_nome, novo_telefone, nome))
+    elif novo_nome:
+        cur.execute(sql, (novo_nome, nome))
+    elif novo_telefone:
+        cur.execute(sql, (novo_telefone, nome))
+
     salvar()
 
 
 def remover():
     nome = input("Nome?\n")
-    index = -1
-    for i in range(len(lista)):
-        if lista[i].nome == nome:
-            index = i
-            break
-    if index > -1:
-        del(lista[index])
-        salvar()
+    sql = "DELETE FROM Contato " \
+          "WHERE Nome LIKE ?"
+    cur.execute(sql, (nome,))
+    salvar()
 
 
 def listar():
-    for c in lista:
-        print(c)
+    for contato in lista:
+        print(contato)
 
 
 def salvar():
-    pickle.dump(lista, open(ARQUIVO, "wb"))
+    con.commit()
+    carregar()
 
 
 def carregar():
     global lista
     try:
-        lista = pickle.load(open(ARQUIVO, "rb"))
+        lista = []
+        cur.execute("SELECT * FROM Contato")
+        for row in cur.fetchall():
+            lista.append(Contato(row[1], row[2]))
     except:
-        pickle.dump(lista, open(ARQUIVO, "wb"))
+        sql = "CREATE TABLE Contato " \
+              "(Id INTEGER PRIMARY KEY AUTOINCREMENT, " \
+              "Nome VARCHAR(255) NOT NULL, " \
+              "Telefone VARCHAR(255) NOT NULL)"
+        cur.execute(sql)
 
 
 carregar()
@@ -72,3 +95,6 @@ while opcao != "0":
         editar()
     elif opcao == "4":
         remover()
+
+
+con.close()
