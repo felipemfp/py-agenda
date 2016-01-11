@@ -6,19 +6,20 @@ class Contato(object):
     def __repr__(self):
         return "%s: %s" % (self.__nome, self.__telefone)
 
-    def get_nome(self):
+    @property
+    def nome(self):
         return self.__nome
 
-    def set_nome(self, nome):
+    @nome.setter
+    def nome(self, nome):
         if nome != "":
             self.__nome = nome
 
-    def get_telefone(self):
+    @property
+    def telefone(self):
         return self.__telefone
 
-    def set_telefone(self, telefone):
+    @telefone.setter
+    def telefone(self, telefone):
         if telefone != "":
             self.__telefone = telefone
-
-    nome = property(fget=get_nome, fset=set_nome)
-    telefone = property(fget=get_telefone, fset=set_telefone)

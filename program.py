@@ -1,7 +1,6 @@
 # coding: utf-8
 
 from Models.Contato import Contato
-import os
 import pickle
 
 ARQUIVO = r"lista.dat"
@@ -62,7 +61,7 @@ carregar()
 
 
 while opcao != "0":
-    print("---------------------\n0: sair\n1: novo\n2: listar\n3: editar\n4: remover")
+    print("#############################\n0: sair | 1: novo | 2: listar | 3: editar | 4: remover")
     opcao = input("O que deseja fazer?")
     if opcao == "1":
         novo()
